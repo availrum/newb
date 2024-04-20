@@ -5,7 +5,7 @@ int det(int a, int b){
 }
 int cnt, maktoone[1000001]; 
 
-int main(){//463
+int main(){//1463
     int N,M,cnt=0;
     cin>>N;
     int leas[N+1]; //**12 4 2 1 / 13 12 4 2 1 / 14 7 6 2 1 / 15 5 4 2 1 / 16 8 4 2 1 / 17 16 8 4 2 1
