@@ -1,5 +1,5 @@
 #include<iostream>
-#include<unordered_map>
+#include<map>
 using namespace std;
 int main(){//25192
     ios::sync_with_stdio(false);
@@ -8,7 +8,7 @@ int main(){//25192
     int N,cnt=0;
     cin>>N;
     string st;
-    unordered_map<string,int> ma;
+    map<string,int> ma;
     for(int i=0; i<N; ++i){
         cin>>st;
         if(st=="ENTER"){
