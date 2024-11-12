@@ -28,7 +28,7 @@ void merge(int a, int b, int c){
     last_value=c;
     if(height[x]==height[y]) ++height[y];
 }
-int main(){//1197
+int main(){//1647
     ios::sync_with_stdio(false);
     cin.tie(NULL);
     cout.tie(NULL);
