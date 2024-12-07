@@ -1,12 +1,19 @@
 #include<iostream>
+#include<queue>
 using namespace std;
-int board[250001], sol[501][501];
+int board[250502], sol[501][501];
+int node[501][501];
 int dirx[8]={1,1,1,0,0,-1,-1,-1};
 int diry[8]={1,0,-1,1,-1,1,0,-1};
 int R,C;
 
+struct pos{
+    int x;
+    int y;
+};
+
 int find(int n){
-    if(n==board[n]) return n;
+    if(board[n]==n) return n;
     return board[n] = find(board[n]);
 }
 
@@ -14,7 +21,7 @@ void merge(int a, int b){
     int x = find(a);
     int y = find(b);
     if(x == y) return;
-    if(x<y) swap(x,y);
+    if(node[(x-1)/C+1][(x-1)%C+1]<node[(y-1)/C+1][(y-1)%C+1]) swap(x,y);
     board[x]=y;
 }
 
@@ -23,39 +30,51 @@ int main(){//16957
     cin.tie(NULL);
     cout.tie(NULL);
     cin>>R>>C;
-    int node[R+1][C+1];
-    for(int i=0; i<=R; ++i){
-        for(int j=0; j<=C; ++j){
-            node[i][j]=0;
-        }
-    }
     for(int i=0; i<=R*C; ++i){
         board[i]=i;
     }
-    int tmp;
+    
+    bool visited[R+1][C+1];
     for(int i=1; i<=R*C; ++i){
-        cin >> board[i];
-        node[(i-1)/R+1][(i-1)%R+1]=board[i];
+        cin >> node[(i-1)/C+1][(i-1)%C+1];
+        board[i]=i;
+        visited[(i-1)/C+1][(i-1)%C+1]=false;
+    }
+    queue<pos> qu;
+    for(int i=1; i<=R; ++i){
+        for(int j=1; j<=C; ++j){
+            if(visited[i][j]) continue;
+            qu.push({i,j});
+            visited[i][j]=true;
+            while(!qu.empty()){
+                int curx=qu.front().x;
+                int cury=qu.front().y;
+                qu.pop();
+                int tx=curx,ty=cury;
+                for(int k=0; k<8; ++k){
+                    int tmpx=curx+dirx[k];
+                    int tmpy=cury+diry[k];
+                    if(tmpx<1 || tmpy<1) continue;
+                    if(tmpx>R || tmpy>C) continue;
+                    if(node[tmpx][tmpy] >= node[tx][ty]) continue;
+                    tx=tmpx;
+                    ty=tmpy;
+                }
+                if(tx != curx || ty != cury){
+                    merge(C*(tx-1)+ty, C*(curx-1)+cury);
+                    if(!visited[tx][ty]){
+                        qu.push({tx,ty});
+                        visited[tx][ty]=true;
+                    }
+                }
+            }
+        }
     }
     for(int i=1; i<=R; ++i){
         for(int j=1; j<=C; ++j){
-            for(int k=0; k<8; ++k){
-                int nx=i+dirx[k];
-                int ny=j+diry[k];
-                if(nx==0 || ny==0) continue;
-                if(nx>R || ny>C) continue;
-                if(node[nx][ny]>=node[i][j]) continue;
-                // cout<<i<<' '<<j<<' '<<k<<'\n';
-                merge(R*(i-1)+j, R*(nx-1)+ny);
-
-                if(board[R*(i-1)+j]==R*(i-1)+j){
-                    ++sol[i][j];
-                }
-                else{
-                    sol[nx][ny] = sol[i][j]+1;
-                    sol[i][j] = 0;
-                }
-            }
+            //[1][1] => [1], [2][1]=>[C+1] , [N][1]=>[N*C+1] ...[i][j]=>[N*(C-1)+j]
+            int tmp=find(C*(i-1)+j);
+            ++sol[(tmp-1)/C+1][(tmp-1)%C+1];
         }
     }
 
