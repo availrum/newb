@@ -22,8 +22,8 @@ int main(){//4963
     for(int i=0; i<K; ++i){
         int x1,y1,x2,y2;
         cin>>x1>>y1>>x2>>y2;
-        for(int j=x1; j<=x2; ++j){
-            for(int k=y1; k<=y2; ++k){
+        for(int j=x1; j<x2; ++j){
+            for(int k=y1; k<y2; ++k){
                 graph[j][k]=0;
             }
         }
@@ -58,7 +58,7 @@ int main(){//4963
     cout<<sol.size()<<'\n';
     for(int i=0; i<sol.size(); ++i){
         cout<<sol[i];
-        if(i!=sol.size()) cout<<' ';
+        if(i!=sol.size()-1) cout<<' ';
         else cout<<'\n';
     }
     
