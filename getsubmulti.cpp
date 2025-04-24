@@ -29,9 +29,9 @@ class segment_tree{
             ll mid=(start+end)/2;
             ll leftchild=2*node+1;
             ll rightchild=2*node+2;
-            ll leftsum=query(leftchild,start,mid,lft,rgt);
-            ll rightsum=query(rightchild,mid+1,end,lft,rgt);
-            return (leftsum*rightsum)%1000000007;
+            ll leftmulti=query(leftchild,start,mid,lft,rgt);
+            ll rightmulti=query(rightchild,mid+1,end,lft,rgt);
+            return (leftmulti*rightmulti)%1000000007;
         }
         void update(ll node, ll start, ll end, ll idx, ll value){
             if(start==end){
