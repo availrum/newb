@@ -1,129 +1,98 @@
 #include<iostream>
 #include<algorithm>
 #include<vector>
-#include<map>
+#include<unordered_map>
 using namespace std;
-long long int hp[100001];
-vector<long long int> sol;
-map<long long int,int> nsig;
-int hpidx;
-void hp_push(int n){
-    hpidx++;//새로운걸 넣으니 index+1;
-    int pushidx=hpidx;
-    hp[pushidx]=n; //배열의 새 인덱스에 push한 숫자를 넣는다
-    if(n<0) nsig[abs(n)]++;
-    while(pushidx != 1 && abs(n) < abs(hp[pushidx/2])){ //최상위노드까지, 새 값이 배열의 바로위 부모노드보다 작은경우만 
-        swap(hp[pushidx],hp[pushidx/2]);
-        pushidx/=2;
+long long int heap[100001];
+vector<long long int> sol; // 답을 저장할 배열 
+unordered_map<long long int,int> negative_count; // 음수 개수 카운팅
+int heap_idx=0;
+void heap_push(int n){
+    ++heap_idx;// 새로운걸 넣으니 전체 개수 index+1;
+    int push_idx=heap_idx;
+    heap[push_idx]=n; // 배열의 새 인덱스에 push한 숫자를 넣는다
+    if(n<0) ++negative_count[abs(n)];
+    while(push_idx != 1 && abs(n) < abs(heap[push_idx/2])){ // 최상위노드까지, 새 값이 배열의 바로위 부모노드보다 작은경우만 
+        swap(heap[push_idx],heap[push_idx/2]);
+        push_idx/=2; // 이진트리의 부모는 해당 자식노드의 인덱스/2
     }
 }
-void hp_remove(){
-    int remidx=1;//,tmp,nidx;
-    // int befmax=hp[remidx];
-    // hp[remidx]=hp[hpidx];//hp[1]
-    swap(hp[remidx],hp[hpidx]);
-    // hp[hpidx]=0;
-    hpidx--;
-    while(hpidx >= remidx*2){
-        if(hpidx==2){
-            if(abs(hp[remidx])<abs(hp[hpidx])) break;
-            else swap(hp[remidx],hp[hpidx]);
+void heap_pop(){
+    int pop_idx=1;
+    swap(heap[pop_idx],heap[heap_idx]); // 지우려는 인덱스와 가장 마지막 값 교체
+    // heap[heap_idx]=0;
+    --heap_idx;
+    while(heap_idx >= pop_idx*2){
+        if(heap_idx==2){
+            if(abs(heap[pop_idx])<abs(heap[heap_idx])) break;
+            else swap(heap[pop_idx],heap[heap_idx]);
             break;
         }
-    //    if(hpidx < remidx *2+1 ){ //마지막줄의 자식노드1만 포함되고 2는 안될경우
-    //         if(hp[remidx*2+1]!=0 && hp[remidx*2+1]<hp[remidx]){
-    //             swap(hp[remidx*2+1],hp[remidx]);
-    //             remidx*=2;
-    //         }
-    //         else break;
-    //     }
-        if(remidx*2+1 <= hpidx){//앞뒤노드 둘다존재
-            if(abs(hp[remidx*2])<=abs(hp[remidx*2+1])){//앞자식이 뒷자식보다 작을때
-                if(abs(hp[remidx*2])<abs(hp[remidx])){//자식노드 중 앞이 부모노드보다 작으면
-                    swap(hp[remidx*2],hp[remidx]);
-                    // cout<<hpidx<<' '<<hp[remidx*2]<<' '<<hp[remidx*2+1]<<'\n'<<'\n';
-                    remidx*=2;
+        if(pop_idx*2+1 <= heap_idx){//앞뒤노드 둘다존재
+            if(abs(heap[pop_idx*2])<=abs(heap[pop_idx*2+1])){//앞자식이 뒷자식보다 작을때
+                if(abs(heap[pop_idx*2])<abs(heap[pop_idx])){//자식노드 중 앞이 부모노드보다 작으면
+                    swap(heap[pop_idx*2],heap[pop_idx]);
+                    // cout<<heap_idx<<' '<<heap[pop_idx*2]<<' '<<heap[pop_idx*2+1]<<'\n'<<'\n';
+                    pop_idx*=2;
                 }
                 else break;
             }
-            else if(abs(hp[remidx*2])>abs(hp[remidx*2+1])){//뒷자식이 앞자식보다 작을때
-                if(abs(hp[remidx*2+1])<abs(hp[remidx])){//자식노드 중 뒤가 부모노드보다 작으면
-                    swap(hp[remidx*2+1],hp[remidx]);
-                    // swap();
-                    remidx=remidx*2+1;
+            else if(abs(heap[pop_idx*2])>abs(heap[pop_idx*2+1])){//뒷자식이 앞자식보다 작을때
+                if(abs(heap[pop_idx*2+1])<abs(heap[pop_idx])){//자식노드 중 뒤가 부모노드보다 작으면
+                    swap(heap[pop_idx*2+1],heap[pop_idx]);
+                    pop_idx=pop_idx*2+1;
                 }
                 else break;
             }
         }
-        else if(remidx *2 <= hpidx){ //앞쪽 노드만 존재
-            if(abs(hp[remidx*2])<abs(hp[remidx])){//자식노드 중 앞이 부모노드보다 작으면
-                swap(hp[remidx*2],hp[remidx]);
-                // cout<<hpidx<<' '<<hp[remidx*2]<<' '<<hp[remidx*2+1]<<'\n'<<'\n';
-                remidx*=2;
+        else if(pop_idx *2 <= heap_idx){ //앞쪽 노드만 존재
+            if(abs(heap[pop_idx*2])<abs(heap[pop_idx])){//자식노드 중 앞이 부모노드보다 작으면
+                swap(heap[pop_idx*2],heap[pop_idx]);
+                // cout<<heap_idx<<' '<<heap[pop_idx*2]<<' '<<heap[pop_idx*2+1]<<'\n'<<'\n';
+                pop_idx*=2;
             }
-            // else if(hp[remidx*2+1]<hp[remidx]){ //자식노드 중 뒤가 부모노드보다 작으면
-            //     swap(hp[remidx*2+1],hp[remidx]);
-            //     remidx=remidx*2+1;
-            // }
             else break; //둘다 상위노드보다 크다
             
         }
     }
 }
-int main(){//11279
+int main(){// 백준 11286번 절댓값 힙 (힙 직접구현)
     ios::sync_with_stdio(false);
     cin.tie(NULL);
     cout.tie(NULL);
     int N;
     long long int num;
     cin>>N;
-    hpidx=0;
-    for(int i=0; i<N; i++){
+    heap_idx=0;
+    for(int i=0; i<N; ++i){
         cin>>num;
-        if(num==0){
-            if(hpidx<1) {
-                // cout<<"0"<<'\n';
+        if(num==0){ // 힙에서 제거하는 연산
+            if(heap_idx<1) {
                 sol.push_back(0);
                 continue;
             }
             else{
-                // cout<<hp[1]<<'\n';
-                if(nsig[abs(hp[1])]>0) {
-                    sol.push_back(-abs(hp[1]));
-                    nsig[abs(hp[1])]--;
+                if(negative_count[abs(heap[1])]>0){ // 만약 해당 절대값에 남은 음수 개수가 있다면 음수로 
+                    sol.push_back(-abs(heap[1]));
+                    --negative_count[abs(heap[1])]; // 음수 개수 -1
                 }
-                else sol.push_back(abs(hp[1]));
-                hp_remove();
-                // hpidx--;
+                else sol.push_back(abs(heap[1]));
+                heap_pop(); //힙에서 빼기
             }
         }
-        else{
-            if(hp[1]==0){
-                hpidx++;
-                hp[1]=num;
-                // hpidx++;
+        else{ // 힙에 추가하는 연산산
+            if(heap[1]==0){
+                ++heap_idx;
+                heap[1]=num;
+                if(num<0) ++negative_count[abs(num)];
                 continue;
             }
-            // else if(hp[2]==0){
-            //     hp[2]=num;
-            //     hpidx++;
-            //     continue; duwk
-            // }
-            // hpidx++;
-            hp_push(num);//i=0> 1-1
+            heap_push(num);//i=0> 1-1
         }
-        // cout<<hpidx<<'\n';
+        // cout<<heap_idx<<'\n';
     }
-    // for(int i=0; i<10; i++){
-        // cout<<hp[i]<<'\n';
-    // }
-    // cout<<'\n';
-    for(int i=0; i<sol.size(); i++){
-        cout<<sol[i]<<'\n';
+    for(int i=0; i<sol.size(); ++i){
+        cout<<sol[i]<<'\n'; 
     }
-    // cout<<hp[1]<<' '<<hp[2]<<'\n';
-    // swap(hp[1],hp[2]);
-    // cout<<hp[1]<<' '<<hp[2]<<'\n';
-    
     return 0;
 }
