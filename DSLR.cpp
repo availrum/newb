@@ -1,7 +1,7 @@
 #include<iostream>
 #include<queue>
 using namespace std;
-int main(){//9019
+int main(){// 백준 9019번 DSLR
     ios::sync_with_stdio(false);
     cin.tie(NULL);
     cout.tie(NULL);
@@ -12,93 +12,93 @@ int main(){//9019
         queue<int> qu;
         cin>>A>>B;
         qu.push(A);
-        int shorte[10000]={0,};
+        int shortest_path[10000]={0,};
         bool visited[10000]={0,};
         string cmd[10000];
         for(int j=0; j<10000; ++j) cmd[j]="";
-        visited[A]=true;
+        visited[A]=true; // 시작숫자
         while(!qu.empty()){
-            int x=qu.front();
+            int current_value=qu.front();
             qu.pop();
-            // cout<<x<<'\n';
-            if(x==B) break;
-            if(2*x<10000){
-                if(!visited[2*x] || shorte[2*x]>shorte[x]+1) {
-                    qu.push(2*x);
-                    visited[2*x]=true;
-                    shorte[2*x]=shorte[x]+1;
-                    cmd[2*x]=cmd[x]+"D";
-                    if(2*x==B) break;
+            // cout<<current_value<<'\n';
+            if(current_value==B) break;
+            if(2*current_value<10000){ // 2*n이 10000아래인 경우 - D
+                if(!visited[2*current_value] || shortest_path[2*current_value]>shortest_path[current_value]+1){ // 방문한 적 없거나 방문했던 것보다 더 빨리 올수있으면
+                    qu.push(2*current_value);
+                    visited[2*current_value]=true;
+                    shortest_path[2*current_value]=shortest_path[current_value]+1;
+                    cmd[2*current_value]=cmd[current_value]+"D";
+                    if(2*current_value==B) break;
                 }
             }
-            else if(2*x>=10000){
-                if(!visited[(2*x)%10000] || shorte[(2*x)%10000]>shorte[x]+1) {
-                    qu.push((2*x)%10000);
-                    visited[(2*x)%10000]=true;
-                    shorte[(2*x)%10000]=shorte[x]+1;
-                    cmd[(2*x)%10000]=cmd[x]+"D";
-                    if((2*x)%10000==B) break;
+            else if(2*current_value>=10000){ // 2*n에 나머지 연산이 필요한 경우 - D
+                if(!visited[(2*current_value)%10000] || shortest_path[(2*current_value)%10000]>shortest_path[current_value]+1) {
+                    qu.push((2*current_value)%10000);
+                    visited[(2*current_value)%10000]=true;
+                    shortest_path[(2*current_value)%10000]=shortest_path[current_value]+1;
+                    cmd[(2*current_value)%10000]=cmd[current_value]+"D";
+                    if((2*current_value)%10000==B) break;
                 }
             }
-            if(x-1>=0){
-                if(!visited[x-1] || shorte[x-1]>shorte[x]+1){
-                    qu.push(x-1);
-                    visited[x-1]=true;
-                    shorte[x-1]=shorte[x]+1;
-                    cmd[x-1]=cmd[x]+"S";
-                    if(x-1==B) break;
+            if(current_value-1>=0){ // current_value-1이 0보다 큰경우 - S
+                if(!visited[current_value-1] || shortest_path[current_value-1]>shortest_path[current_value]+1){
+                    qu.push(current_value-1);
+                    visited[current_value-1]=true;
+                    shortest_path[current_value-1]=shortest_path[current_value]+1;
+                    cmd[current_value-1]=cmd[current_value]+"S";
+                    if(current_value-1==B) break;
                 }
             }
-            else if(x-1<0){
-                if(!visited[x+9999] || shorte[x+9999]>shorte[x]+1){
-                    qu.push(x+9999);
-                    visited[x+9999]=true;
-                    shorte[x+9999]=shorte[x]+1;
-                    cmd[x+9999]=cmd[x]+"S";
-                    if(x+9999==B) break;
+            else if(current_value-1<0){ // current_value-1이 -가 되는경우 9999로 - S
+                if(!visited[current_value+9999] || shortest_path[current_value+9999]>shortest_path[current_value]+1){
+                    qu.push(current_value+9999);
+                    visited[current_value+9999]=true;
+                    shortest_path[current_value+9999]=shortest_path[current_value]+1;
+                    cmd[current_value+9999]=cmd[current_value]+"S";
+                    if(current_value+9999==B) break;
                 }
             }
-            if(x*10>=10000){
-                int tmpl=x/1000;
-                if(!visited[(x*10)%10000+tmpl] || shorte[(x*10)%10000+tmpl]>shorte[x]+1){
-                    qu.push((x*10)%10000+tmpl);
-                    visited[(x*10)%10000+tmpl]=true;
-                    shorte[(x*10)%10000+tmpl]=shorte[x]+1;
-                    cmd[(x*10)%10000+tmpl]=cmd[x]+"L";
-                    if((x*10)%10000+tmpl==B) break;
+            if(current_value*10>=10000){ // n*10이 10000을 넘어가는 경우 - L
+                int tmpL=current_value/1000;
+                if(!visited[(current_value*10)%10000+tmpL] || shortest_path[(current_value*10)%10000+tmpL]>shortest_path[current_value]+1){
+                    qu.push((current_value*10)%10000+tmpL);
+                    visited[(current_value*10)%10000+tmpL]=true;
+                    shortest_path[(current_value*10)%10000+tmpL]=shortest_path[current_value]+1;
+                    cmd[(current_value*10)%10000+tmpL]=cmd[current_value]+"L";
+                    if((current_value*10)%10000+tmpL==B) break;
                 }
             }
-            else if(x*10<10000){
-                if(!visited[x*10] || shorte[x*10]>shorte[x]+1){
-                    qu.push(x*10);
-                    visited[x*10]=true;
-                    shorte[x*10]=shorte[x]+1;
-                    cmd[x*10]=cmd[x]+"L";
-                    if(x*10==B) break;
+            else if(current_value*10<10000){ // n*10이 10000 아래인 경우 ex)0987 - L
+                if(!visited[current_value*10] || shortest_path[current_value*10]>shortest_path[current_value]+1){
+                    qu.push(current_value*10);
+                    visited[current_value*10]=true;
+                    shortest_path[current_value*10]=shortest_path[current_value]+1;
+                    cmd[current_value*10]=cmd[current_value]+"L";
+                    if(current_value*10==B) break;
                 }
             }
-            if(x%10!=0){
-                int tmpr=x%10;
-                if(!visited[x/10+tmpr*1000] || shorte[x/10+tmpr*1000]>shorte[x]+1){
-                    qu.push(x/10+tmpr*1000);
-                    visited[x/10+tmpr*1000]=true;
-                    shorte[x/10+tmpr*1000]=shorte[x]+1;
-                    cmd[x/10+tmpr*1000]=cmd[x]+"R";
-                    if(x/10+tmpr*1000==B) break;
+            if(current_value%10!=0){ // n을 오른쪽으로 넘기는경우 1의자리가 0이 아닐때 ex)1234->4123 - R
+                int tmpR=current_value%10;
+                if(!visited[current_value/10+tmpR*1000] || shortest_path[current_value/10+tmpR*1000]>shortest_path[current_value]+1){
+                    qu.push(current_value/10+tmpR*1000);
+                    visited[current_value/10+tmpR*1000]=true;
+                    shortest_path[current_value/10+tmpR*1000]=shortest_path[current_value]+1;
+                    cmd[current_value/10+tmpR*1000]=cmd[current_value]+"R";
+                    if(current_value/10+tmpR*1000==B) break;
                 }
             }
-            else if(x%10==0){
-                if(!visited[x/10] || shorte[x/10]>shorte[x]+1){
-                    qu.push(x/10);
-                    visited[x/10]=true;
-                    shorte[x/10]=shorte[x]+1;
-                    cmd[x/10]=cmd[x]+"R";
-                    if(x/10==B) break;
+            else if(current_value%10==0){ // n을 오른쪽으로 넘기는경우 1의 자리가 0일때 ex)1230->2301 - R
+                if(!visited[current_value/10] || shortest_path[current_value/10]>shortest_path[current_value]+1){
+                    qu.push(current_value/10);
+                    visited[current_value/10]=true;
+                    shortest_path[current_value/10]=shortest_path[current_value]+1;
+                    cmd[current_value/10]=cmd[current_value]+"R";
+                    if(current_value/10==B) break;
                 }
             }
             
         }
-        // cout<<shorte[B]<<'\n';
+        // cout<<shortest_path[B]<<'\n';
         cout<<cmd[B]<<'\n';
     }
 }
